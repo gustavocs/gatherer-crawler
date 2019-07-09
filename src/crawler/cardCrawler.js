@@ -13,7 +13,7 @@ const getCard = (cardId) => {
                     
                     const card = {
                         name: $(`${config.cardNameContainer}`).text().trim(),
-                        imageUrl: $(`${config.cardImageContainer}`).attr('src'),
+                        imageUrl: config.cardImageUrl(cardId),
                         cmc: $(`${config.cardCmcContainer}`).text().trim(),
                         type: $(`${config.cardTypeContainer}`).text().trim(),
                         pt: $(`${config.cardPtContainer}`).text().trim(),

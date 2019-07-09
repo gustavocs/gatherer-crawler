@@ -14,9 +14,7 @@ module.exports = {
     cardNumberContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_numberRow .value',
     cardArtistContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_artistRow .value a',
     cardRulesContainer: '.rulingsTable .rulingsText',
-    cardLanguageContainer: '.cardList .cardItem td:eq(1)',
-    cardTranslatedLanguageContainer: '.cardList .cardItem td:eq(2)',
-    cardTranslatedNameContainer: '.cardList .cardItem td:eq(0)',
+    cardLanguageContainer: '.cardList .cardItem',
 
     cardSearchUrl: (edition, page) => { return `https://gatherer.wizards.com/Pages/Search/Default.aspx?set=["${edition}"]&page=${page}`; },
     cardDetailsUrl: (cardId) => { return `https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=${cardId}` },
