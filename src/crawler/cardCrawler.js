@@ -10,9 +10,22 @@ const getCard = (cardId) => {
                     reject(error);
                 } else {
                     const $ = res.$;
+                    
                     const card = {
                         name: $(`${config.cardNameContainer}`).text().trim(),
-                        cmc: $(`${config.cardCmcContainer}`).text().trim()
+                        imageUrl: $(`${config.cardImageContainer}`).attr('src'),
+                        cmc: $(`${config.cardCmcContainer}`).text().trim(),
+                        type: $(`${config.cardTypeContainer}`).text().trim(),
+                        pt: $(`${config.cardPtContainer}`).text().trim(),
+                        rarity: $(`${config.cardRarityContainer}`).text().trim(),
+                        number: $(`${config.cardNumberContainer}`).text().trim(),
+                        artist: $(`${config.cardArtistContainer}`).text().trim(),
+                        mana: $(`${config.cardManaContainer}`).map((i, img) => {
+                            return $(img).attr('alt');
+                        }).toArray(),
+                        rulings: $(`${config.cardRulesContainer}`).map((i, element) => {
+                            return $(element).text().trim();
+                        }).toArray()
                     }
                     resolve(card); 
                 }
