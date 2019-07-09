@@ -1,7 +1,7 @@
 const crawler = require("crawler");
 
 module.exports = new crawler({
-    maxConnections: 1,
+    maxConnections: 50,
     callback : function (error, res, done) {
         if(error){
             console.log(error);

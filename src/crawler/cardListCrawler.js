@@ -2,12 +2,20 @@ const config = require("./config");
 const c = require('./crawler');
 
 var cardIds = {};
-var pageNumber = 0;
 
-const getCards = (edition, page) => {
+const getCardList = (edition, page) => {
+    if(!cardIds[edition]) {
+        cardIds = {
+            ...cardIds,
+            [edition]: {
+                cards: [],
+                pageNumber: 0
+            }
+        }
+    }
     return new Promise((resolve, reject) => {
         c.queue([{
-            uri: config.cardSearchUrl(edition, pageNumber),
+            uri: config.cardSearchUrl(edition, page),
             callback: (error, res, done)  => {
                 if (error){
                     reject(error);
@@ -16,13 +24,14 @@ const getCards = (edition, page) => {
                     const cards = $(`${config.cardIdContainer}`).map((index, element) => {
                         const el = $(element).attr('href');
                         const cardId = el.substring(el.indexOf('=') + 1);
-                        cardIds[edition].push(cardId);
+                        cardIds[edition].cards.push(cardId);
 
                         return cardId;
                     });
             
-                    if (cards.length < 100) {
-                        getCards(edition, pageNumber++);
+                    if (cards.length >= 100) {
+                        cardIds[edition].pageNumber++;
+                        resolve(getCardList(edition, cardIds[edition].pageNumber));
                     }
                     else {
                         resolve(cardIds);
@@ -34,4 +43,4 @@ const getCards = (edition, page) => {
     });
 }
 
-module.exports = { getCards };
+module.exports = { getCardList };

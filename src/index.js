@@ -2,15 +2,21 @@
 
 // imports
 const editionsCrawler = require('./crawler/editionsCrawler');
-const cardsCrawler = require('./crawler/cardsCrawler');
+const cardsListCrawler = require('./crawler/cardListCrawler');
+const cardCrawler = require('./crawler/cardCrawler');
 
 // call
 editionsCrawler.getEditions()
     .then((result) => {
         result.toArray().forEach(edition => {
             if (edition){
-                cardsCrawler.getCards(edition).then((cardIds) => {
-                    console.log(`${edition}: ${cardIds.length}`);
+                cardsListCrawler.getCardList(edition).then((cardIds) => {
+                    cardIds[edition].cards.forEach(cardId => {
+                        cardCrawler.getCard(cardId).then((card) => {
+                            console.log(`${card}`);
+                        });
+                    });
+                    console.log(`${edition}: ${cardIds[edition].cards.length}`);
                 });
             }
         });
