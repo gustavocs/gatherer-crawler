@@ -1,7 +1,7 @@
 const config = require("./config");
-const c = require('./crawler');
+const c = require('./_crawler');
 
-const getEditions = () => {
+const get = () => {
     return new Promise((resolve, reject) => {
         c.queue([{
             uri: config.defaultUrl,
@@ -22,4 +22,4 @@ const getEditions = () => {
     });
 }
 
-module.exports = { getEditions };
+module.exports = { get };

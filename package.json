@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/gustavocs/gatherer-crawler#readme",
   "devDependencies": {
-    "eslint": "^6.0.1"
+    "eslint": "^6.0.1",
+    "mongodb": "^3.2.7"
   },
   "dependencies": {
     "crawler": "^1.2.1"

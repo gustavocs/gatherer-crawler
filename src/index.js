@@ -1,41 +1,37 @@
 // index.js
 
 // imports
-const editionsCrawler = require('./crawler/editionsCrawler');
-const cardsListCrawler = require('./crawler/cardListCrawler');
-const cardCrawler = require('./crawler/cardCrawler');
-const cardLanguagesCrawler = require('./crawler/cardLanguagesCrawler');
+const editionsCrawler = require('./crawler/editions');
+const cardsListCrawler = require('./crawler/cardList');
+const cardCrawler = require('./crawler/card');
+const cardLanguagesCrawler = require('./crawler/cardLanguages');
+const cardPrintings = require('./crawler/cardPrintingsAndLegality');
 
-// call
-editionsCrawler.getEditions()
+const db = require('./db/client');
+
+editionsCrawler.get()
     .then((result) => {
         result.toArray().forEach(edition => {
             if (edition){
-                cardsListCrawler.getCardList(edition).then((cardIds) => {
+                cardsListCrawler.get(edition).then((cardIds) => {
                     cardIds[edition].cards.forEach(cardId => {
-                        cardCrawler.getCard(cardId).then((card) => {
-                            console.log(`${card}`);
-                            cardsListCrawler.getCardList(edition).then((cardIds) => {
-                                // cardIds[edition].cards.forEach(cardId => {
-                                //     cardCrawler.getCard(cardId).then((card) => {
-                                //         console.log(`${card}`);
-                                //     });
-                                // });
-                                cardIds[edition].cards.forEach(cardId => {
-                                    cardLanguagesCrawler.get(cardId).then((cards) => {
-                                        cards.forEach(cardId => {
-                                            cardCrawler.getCard(cardId).then((card) => {
-                                                console.log(`${card}`);
-                                            });
-                                        });
-                                     });
-                                 });
-                                console.log(`${edition}: ${cardIds[edition].cards.length}`);
+                        cardCrawler.get(cardId).then((card) => {
+                            cardLanguagesCrawler.get(cardId).then((languages) => {
+                                card = { 
+                                    ...card,
+                                    languages,
+                                }
+                                cardPrintings.get(cardId).then((printigsAndLegality) => {
+                                    card = { 
+                                        ...card,
+                                        printigsAndLegality,
+                                    }
+                                    
+                                    db.insert(card);
+                                });
                             });
-
                         });
                     });
-                    console.log(`${edition}: ${cardIds[edition].cards.length}`);
                 });
             }
         });
