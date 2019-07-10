@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/src/spec/card.js"
+            "program": "${workspaceFolder}\\src\\debug.js"
         }
     ]
 }

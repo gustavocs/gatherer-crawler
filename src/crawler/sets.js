@@ -13,7 +13,7 @@ const get = () => {
                         const editions = $(`${config.editionsContainer} option`).map((index, element) => {
                             return $(element).val();
                         });
-                        resolve(editions);
+                        resolve(editions.toArray().filter(edition => edition.length > 1));
                     }
                     done();
                 

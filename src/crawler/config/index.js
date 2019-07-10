@@ -8,6 +8,7 @@ module.exports = {
     cardManaContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_manaRow .value img',
     cardCmcContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_cmcRow .value',
     cardTypeContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_typeRow .value',
+    cardTextContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_textRow .value',
     cardFlavorContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_flavorRow .value .flavortextbox',
     cardPtContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_ptRow .value',
     cardSetContainer: '#ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_setRow .value a',
