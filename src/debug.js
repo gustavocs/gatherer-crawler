@@ -1,8 +1,7 @@
 // imports
 const cardCrawler = require('./crawler/card');
 
-// Temple Garden
-const cardId = 89093;
+const cardId = 27166;
 
 cardCrawler.get(cardId).then((card) => {
     console.log(card);

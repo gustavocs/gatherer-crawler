@@ -23,10 +23,10 @@ const creatureId = 36111;
 const planeswalkerId = 235597;
 
 // Double faced: Huntmaster of the Fells
-const doubleFacedId = 235597;
+const doubleFacedId = 262875;
 
-// Double faced: Huntmaster of the Fells
-const splitCardId = 235597;
+// Split card: Fire / Ice
+const splitCardId = 27166;
 
 describe('Crawler tests', () => {
     it('should get all sets', (done) => {
@@ -162,18 +162,16 @@ describe('Crawler tests', () => {
         }, (error) => { done(error) });
     });
 
-    it('should get card details: double faced', (done) => {
+    it.only('should get card details: double faced', (done) => {
         cardCrawler.get(doubleFacedId).then((card) => {
-            //TODO: double faced
             assert.ok(card);
             
             done();
         }, (error) => { done(error) });
     });
 
-    it('should get card details: split card', (done) => {
+    it.only('should get card details: split card', (done) => {
         cardCrawler.get(splitCardId).then((card) => {
-            //TODO: split card
             assert.ok(card);
             
             done();
