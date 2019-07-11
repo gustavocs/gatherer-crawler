@@ -5,6 +5,6 @@ const cardCrawler = require('./crawler/card');
 const cardId = 89093;
 
 cardCrawler.get(cardId).then((card) => {
-    console.log(error);
+    console.log(card);
     }, (error) => console.log(error)
 );
