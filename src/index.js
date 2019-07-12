@@ -11,8 +11,9 @@ const db = require('./db/client');
 
 setsCrawler.get()
     .then((result) => {
-        result.toArray().forEach(set => {
-            cardsListCrawler.get(edition).then((cardIds) => {
+        db.insertMany('sets', result.map((el, index) => { return { id: index, name: el } }));
+        result.forEach(set => {
+            cardsListCrawler.get(set).then((cardIds) => {
                 cardIds[set].cards.forEach(cardId => {
                     cardCrawler.get(cardId).then((card) => {
                         cardLanguagesCrawler.get(cardId).then((languages) => {
@@ -26,7 +27,7 @@ setsCrawler.get()
                                     printigsAndLegality,
                                 }
                                 
-                                db.insert(card);
+                                db.insert('cards', card);
                             });
                         });
                     });
