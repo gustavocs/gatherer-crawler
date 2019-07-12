@@ -1,18 +1,14 @@
 const config = require("./config");
 const c = require('./_crawler');
 
-var cardIds = {};
-
-const get = (edition, page) => {
-    if(!cardIds[edition]) {
-        cardIds = {
-            ...cardIds,
-            [edition]: {
-                cards: [],
-                pageNumber: 0
-            }
-        }
-    }
+const get = (edition) => {
+    return new Promise((resolve, reject) => {
+        getCardList(edition, 0, []).then(cards => {
+            resolve(cards);
+        }, (error) => reject(error));
+    });
+}
+const getCardList = (edition, page, cards) => {
     return new Promise((resolve, reject) => {
         c.queue([{
             uri: config.cardSearchUrl(edition, page),
@@ -21,20 +17,18 @@ const get = (edition, page) => {
                     reject(error);
                 } else {
                     const $ = res.$;
-                    const cards = $(`${config.cardIdContainer}`).map((i, element) => {
+                    $(`${config.cardIdContainer}`).toArray().forEach(element => {
                         const el = $(element).attr('href');
                         const cardId = el.split('multiverseid=')[1].split('&')[0];
-                        cardIds[edition].cards.push(cardId);
-
-                        return cardId;
+                        cards.push(cardId);
                     });
-            
-                    if (cards.length >= 100) {
-                        cardIds[edition].pageNumber++;
-                        resolve(get(edition, cardIds[edition].pageNumber));
+                        
+                    if ($(`${config.cardIdContainer}`).length >= 100) {
+                        page++;
+                        resolve(getCardList(edition, page, cards));
                     }
                     else {
-                        resolve(cardIds);
+                        resolve(cards);
                     }
                 }
                 done();

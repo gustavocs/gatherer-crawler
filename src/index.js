@@ -23,10 +23,13 @@ const execute = async () => {
     console.log(`All sets retrieved: ${ sets.join(', ') }. Inserting...`);
     db.insertMany('sets', sets.map((el, index) => { return { id: index, name: el } })).then(() => console.log('done!'));
     
+    let setCards = {};
     for (const set in sets){
-        const cards = await cardsListCrawler.get(set);
-        console.log(`Retrieved ${ cards[set].cards.length } cards from ${set}`);
+        setCards = await cardsListCrawler.get(sets[set]);
+        console.log(`Retrieved ${ setCards.length } cards from ${sets[set]}`);
+    }
 
+    for (const set in Object.keys(setCards)) {
         for (const cardId in cards[set].cards) {
             let card = await cardCrawler.get(cardId);
             console.log(`Retrieved ${ card.name } succesfuly!`);
@@ -42,7 +45,7 @@ const execute = async () => {
             db.insert(card);
         }
     }
-
+    
     process.exit();
 }
 
