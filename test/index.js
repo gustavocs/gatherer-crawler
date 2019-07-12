@@ -98,6 +98,14 @@ describe('Crawler tests', () => {
             assert.equal(card.text, 
                 `([Tap]: Add [Green] or [White].)\nAs Temple Garden enters the battlefield, you may pay 2 life. If you don't, it enters the battlefield tapped.`);
 
+            assert.equal(card.rulings[0].date.getTime(), new Date(2018, 9, 5).getTime());
+            assert.equal(card.rulings[0].ruling, 
+                `Unlike most dual lands, this land has two basic land types. It’s not basic, so cards such as District Guide can’t find it, but it does have the appropriate land types for effects such as that of Drowned Catacomb (from the Ixalan set).`);
+            
+            assert.equal(card.rulings[1].date.getTime(), new Date(2018, 9, 5).getTime());
+            assert.equal(card.rulings[1].ruling, 
+                `If an effect puts this land onto the battlefield tapped, you may pay 2 life, but it still enters tapped.`);
+
             done();
         }, (error) => { done(error) });
     });
@@ -162,17 +170,127 @@ describe('Crawler tests', () => {
         }, (error) => { done(error) });
     });
 
-    it.only('should get card details: double faced', (done) => {
+    it('should get card details: double faced', (done) => {
         cardCrawler.get(doubleFacedId).then((card) => {
             assert.ok(card);
+
+            assert.ok(Array.isArray(card.faces));
+            assert.equal(card.faces.length, 2);
+            assert.equal(card.name, 'Huntmaster of the Fells');
+            assert.equal(card.set.key, 'DKA');
+            assert.equal(card.set.name, 'Dark Ascension');
+            assert.equal(card.rarity, 'Mythic Rare');
+
+            //#region card1
+            const card1 = card.faces[0];
+            assert.equal(card1.name, 'Huntmaster of the Fells');
+
+            assert.equal(card1.mana[0], '2');
+            assert.equal(card1.mana[1], 'Red');
+            assert.equal(card1.mana[2], 'Green');
+
+            assert.equal(card1.type, 'Creature');
+
+            assert.ok(Array.isArray(card1.subTypes));
+            assert.equal(card1.subTypes[0], 'Human');
+            assert.equal(card1.subTypes[1], 'Werewolf');
             
+
+            assert.equal(card1.cmc, '4');
+            assert.equal(card1.rarity, 'Mythic Rare');
+            assert.equal(card1.number, '140a');
+            assert.equal(card1.artist, 'Chris Rahn');
+            assert.equal(card1.pt, '2 / 2');
+            assert.equal(card1.text, 
+                `Whenever this creature enters the battlefield or transforms into Huntmaster of the Fells, create a 2/2 green Wolf creature token and you gain 2 life.\nAt the beginning of each upkeep, if no spells were cast last turn, transform Huntmaster of the Fells.`);   
+
+            assert.ok(Array.isArray(card1.rulings));
+            assert.equal(card1.rulings[0].date.getTime(), new Date(2016, 6, 13).getTime());
+            assert.equal(card1.rulings[0].ruling, 
+                `For more information on double-faced cards, see the Shadows over Innistrad mechanics article (http://magic.wizards.com/en/articles/archive/feature/shadows-over-innistrad-mechanics).`);
+            //#endregion
+
+            //#region card2
+            const card2 = card.faces[1];
+            assert.equal(card2.name, 'Ravager of the Fells');
+            assert.equal(card2.mana.length, 0);
+            assert.equal(card2.type, 'Creature');
+            assert.ok(Array.isArray(card2.subTypes));
+            assert.equal(card2.subTypes[0], 'Werewolf');
+            assert.equal(card2.cmc, '4');
+            assert.equal(card2.rarity, 'Mythic Rare');
+            assert.equal(card2.number, '140b');
+            assert.equal(card2.artist, 'Chris Rahn');
+            assert.equal(card2.pt, '4 / 4');
+            assert.equal(card2.text, 
+                `Trample\nWhenever this creature transforms into Ravager of the Fells, it deals 2 damage to target opponent or planeswalker and 2 damage to up to one target creature that player or that planeswalker's controller controls.\nAt the beginning of each upkeep, if a player cast two or more spells last turn, transform Ravager of the Fells.`);
+            //#endregion
+
             done();
         }, (error) => { done(error) });
     });
 
-    it.only('should get card details: split card', (done) => {
+    it('should get card details: split card', (done) => {
         cardCrawler.get(splitCardId).then((card) => {
             assert.ok(card);
+
+            assert.ok(Array.isArray(card.faces));
+            assert.equal(card.faces.length, 2);
+
+            assert.equal(card.name, 'Fire // Ice');
+            assert.equal(card.set.key, 'AP');
+            assert.equal(card.set.name, 'Apocalypse');
+            assert.equal(card.rarity, 'Uncommon');
+
+            //#region card1
+            const card1 = card.faces[0];
+            assert.equal(card1.name, 'Fire');
+
+            assert.equal(card1.mana[0], '1');
+            assert.equal(card1.mana[1], 'Red');
+
+            assert.equal(card1.type, 'Instant');
+
+            assert.ok(Array.isArray(card1.subTypes));
+            
+            assert.equal(card1.cmc, '2');
+            assert.equal(card1.number, '128a');
+            assert.equal(card1.artist, 'Franz Vohwinkel');
+            assert.equal(card1.text.trim(), 
+                `Fire deals 2 damage divided as you choose among one or two targets.`);
+
+            assert.ok(Array.isArray(card1.rulings));
+            assert.ok(card1.rulings[0].date.getTime(), new Date(2018, 11, 7).getTime());
+            assert.ok(card1.rulings[0].ruling, 
+                `You divide the damage as you cast Fire, not as it resolves. Each target must be assigned at least 1 damage. In other words, as you cast Fire, you choose whether to have it deal 2 damage to a single target, or deal 1 damage to each of two targets.`);
+            
+            assert.ok(card1.rulings[0].date.getTime(), new Date(2018, 11, 7).getTime());
+            assert.ok(card1.rulings[0].ruling, 
+                `If Fire targets two creatures and one becomes an illegal target, the remaining target is dealt 1 damage, not 2.`);
+            //#endregion
+
+            //#region card2
+            const card2 = card.faces[1];
+            assert.equal(card2.name, 'Ice');
+
+            assert.equal(card2.mana[0], '1');
+            assert.equal(card2.mana[1], 'Blue');
+
+            assert.equal(card2.type, 'Instant');
+            assert.ok(Array.isArray(card2.subTypes));
+           
+            assert.equal(card2.cmc, '2');
+            assert.equal(card2.rarity, 'Uncommon');
+            assert.equal(card2.number, '128b');
+            assert.equal(card2.artist, 'Franz Vohwinkel');
+
+            assert.equal(card2.text, 
+                `Tap target permanent.\nDraw a card.`);
+
+            assert.equal(card2.rulings[0].date.getTime(), new Date(2018, 11, 7).getTime());
+            assert.equal(card2.rulings[0].ruling, 
+                    `If the target permanent becomes an illegal target for Ice, the spell doesn’t resolve. You don’t draw a card.`);
+            //#endregion
             
             done();
         }, (error) => { done(error) });

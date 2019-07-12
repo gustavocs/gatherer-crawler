@@ -14,9 +14,10 @@ const bindCard = ($, cardId, single, containerId) => {
         text = text.concat(`${$(textString).text().trim()}${(i < $(`${config.cardContainer(cardProperty.TEXT, single, containerId)} .cardtextbox`).length - 1) ? '\n' : ''}`);
     });
 
+    cardId = (single) ? cardId : $(config.cardContainer(cardProperty.IMAGE, single, containerId)).attr('src').split('multiverseid=')[1].split('&')[0];
     card = {
         id: cardId,
-        text,
+        text: text.trim(),
         imageUrl: config.cardImageUrl(cardId),
         name: $(config.cardContainer(cardProperty.NAME, single, containerId)).text().trim(),
         cmc: $(config.cardContainer(cardProperty.CMC, single, containerId)).text().trim(),
@@ -28,22 +29,21 @@ const bindCard = ($, cardId, single, containerId) => {
         subTypes: (types.length > 1) ?
             $(types)[1].trim().split(' ') : [],
         set: {
-            key: $($($(config.cardContainer(cardProperty.SET, single, containerId))[0]).find('img')).attr('src').split('set=')[1].split('&')[0],
-            name: $($(config.cardContainer(cardProperty.SET, single, containerId))[1]).text().trim()
+            key: $($($(config.cardContainer(cardProperty.SET, single, containerId)).eq(0)).find('img')).attr('src').split('set=')[1].split('&')[0],
+            name: $($(config.cardContainer(cardProperty.SET, single, containerId)).eq(1)).text().trim()
         },
         mana: $(config.cardContainer(cardProperty.MANA, single, containerId)).map((i, img) => {
             return $(img).attr('alt');
         }).toArray(),
         rulings: $(config.cardRulingsContainer(single, containerId)).map((i, element) => {
             return {
-                date: $(element).find('td').eq(0).text().trim(), 
+                date: new Date($(element).find('td').eq(0).text().trim()), 
                 ruling: $(element).find('td').eq(1).text().trim() };
         }).toArray()
     };
 
     return card;
 }
-
 
 const get = (cardId) => {
     return new Promise((resolve, reject) => {
@@ -57,7 +57,7 @@ const get = (cardId) => {
                         const $ = res.$;
                         let card = {};
 
-                        if($(config.cardComponentContainer).length == 1) {
+                        if($(`${config.cardComponentContainer} .cardDetails`).length == 1) {
                             card = bindCard($, cardId, true);
                         } else {
                             card = {
@@ -67,9 +67,17 @@ const get = (cardId) => {
                             
                             $(config.cardComponentContainer).toArray().forEach((e) => {
                                 const id = $(e).find('div').first().attr('id');
-                                card.faces.push(bindCard($, cardId, false, id.substring(id.indexOf('SubContent_ctl')+14, (id.length - 17))));
+                                const face = bindCard($, cardId, false, id.substring(id.indexOf('SubContent_ctl')+14, (id.length - 17)));
+                                card.faces.push(face);
                             });
+
+                            card.set = card.faces[0].set;
+                            card.rarity = card.faces[0].rarity;
+                            
+                            // TODO: Review
+                            // card.cmc = card.faces.max(f => f.cmc);
                         }
+
                         resolve(card); 
                     } catch (error) {
                         reject(`${cardId}: ${error}`);

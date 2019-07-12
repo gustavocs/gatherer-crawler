@@ -9,5 +9,6 @@ module.exports = {
     SET: 'Set',
     RARITY: 'Rarity',
     NUMBER: 'Card number',
-    ARTIST: 'Artist'
+    ARTIST: 'Artist',
+    IMAGE: 'Card image'
 }

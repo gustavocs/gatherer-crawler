@@ -38,6 +38,7 @@ module.exports = {
             case cardProperty.RARITY: { container = 'rarityRow .value span'; break; }
             case cardProperty.NUMBER: { container = 'numberRow .value'; break; }
             case cardProperty.ARTIST: { container = 'artistRow .value a'; break; }
+            case cardProperty.IMAGE: { container = 'cardImage'; break; }
         }
 
         return (single) ? `${singleCardContainerId + container }` 

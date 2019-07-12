@@ -4,7 +4,6 @@ const MongoClient = require('mongodb').MongoClient,
 const client = new MongoClient(new Server("localhost", 27017), { native_parser: true, autoIndex: false });
 
 const insert = (collection, card) => {
-  
   return new Promise((resolve, reject) => {
     client.connect((err, mongoclient) => {
       if (err) reject(err);
@@ -20,4 +19,4 @@ const insert = (collection, card) => {
   });
 }
 
-module.exports = {  insert };
+module.exports = { insert };
