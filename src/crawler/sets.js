@@ -6,17 +6,16 @@ const get = () => {
         c.queue([{
             uri: config.defaultUrl,
             callback: (error, res, done)  => {
-                    if (error){
-                        reject(error);
-                    } else {
-                        const $ = res.$;
-                        const editions = $(`${config.editionsContainer} option`).map((index, element) => {
-                            return $(element).val();
-                        });
-                        resolve(editions.toArray().filter(edition => edition.length > 1));
-                    }
-                    done();
-                
+                if (error){
+                    reject(error);
+                } else {
+                    const $ = res.$;
+                    const editions = $(`${config.editionsContainer} option`).map((index, element) => {
+                        return $(element).val();
+                    });
+                    resolve(editions.toArray().filter(edition => edition.length > 1));
+                }
+                done();
             }
         }]);
     });
