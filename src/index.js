@@ -9,30 +9,31 @@ const cardPrintings = require('./crawler/cardPrintingsAndLegality');
 
 const db = require('./db/client');
 
-setsCrawler.get()
-    .then((result) => {
-        db.insertMany('sets', result.map((el, index) => { return { id: index, name: el } }));
-        result.forEach(set => {
-            cardsListCrawler.get(set).then((cardIds) => {
-                cardIds[set].cards.forEach(cardId => {
-                    cardCrawler.get(cardId).then((card) => {
-                        cardLanguagesCrawler.get(cardId).then((languages) => {
-                            card = { 
-                                ...card,
-                                languages,
-                            }
-                            cardPrintings.get(cardId).then((printigsAndLegality) => {
-                                card = { 
-                                    ...card,
-                                    printigsAndLegality,
-                                }
-                                
-                                db.insert('cards', card);
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    }, (error) => console.log(error)
-);
+const execute = async () => {
+    const sets = await setsCrawler.get();
+    console.log(`All sets retrieved: ${ sets.join(', ') }. Inserting...`);
+    db.insertMany('sets', sets.map((el, index) => { return { id: index, name: el } })).then(() => console.log('done!'));
+    
+    sets.forEach(async set => {
+        const cards = await cardsListCrawler.get(set);
+        console.log(`Retrieved ${ cards[set].cards.length } cards from ${set}`);
+
+        for (const cardId of cards[set].cards) {
+            let card = await cardCrawler.get(cardId);
+            console.log(`Retrieved ${ card.name } succesfuly!`);
+
+            const languages = await cardLanguagesCrawler.get(cardId);
+            const printigsAndLegality = await cardPrintings.get(cardId)
+            card = { 
+                ...card,
+                languages,
+                printigsAndLegality
+            }
+            console.log(`Retrieved languages and printings succesfuly! Inserting...`);
+
+            db.insert('cards', card).then(() => console.log('done!'));
+        }
+    });
+}
+                       
+execute();

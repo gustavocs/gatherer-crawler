@@ -1,9 +1,10 @@
 const MongoClient = require('mongodb').MongoClient,
       Server = require('mongodb').Server;
 
-const client = new MongoClient(new Server("localhost", 27017), { native_parser: true });
 
 const insertMany = (collection, objs) => {
+  const client = new MongoClient(new Server("localhost", 27017), { native_parser: true });
+
   return new Promise((resolve, reject) => {
     client.connect((err, mongoclient) => {
       if (err) reject(err);
@@ -13,13 +14,15 @@ const insertMany = (collection, objs) => {
       .collection(collection)
       .insertMany(objs)
       .then((res) => {
-          console.log(`Inserted: ${ objs }`);
+          resolve(res);
       }, (error) => { console.log(error); });
     });
   });
 }
 
 const insert = (collection, obj) => {
+  const client = new MongoClient(new Server("localhost", 27017), { native_parser: true });
+
   return new Promise((resolve, reject) => {
     client.connect((err, mongoclient) => {
       if (err) reject(err);
@@ -29,7 +32,7 @@ const insert = (collection, obj) => {
       .collection(collection)
       .insertOne(obj)
       .then((res) => {
-          console.log(`Inserted: ${ obj }`);
+          resolve(res);
       }, (error) => { console.log(error); });
     });
   });
