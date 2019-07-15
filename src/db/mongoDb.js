@@ -27,7 +27,7 @@ class MongoDb {
   }
 
   async insertManyOptimized(collection, objs) {
-    const size = this.maxSizeInsertMany;
+    const size = Math.min(objs.length, this.maxSizeInsertMany);
     for (let i = 0; i < Math.round(objs.length / size); i++) {
       await this.insertMany(collection, objs.slice(i * size, (i * size) + size));
     }
@@ -52,6 +52,48 @@ class MongoDb {
         db
           .collection(collection)
           .insertOne(obj)
+          .then((res) => {
+              resolve(res);
+          });
+      });
+    }, (error) => { console.log(error); reject(error); });
+  }
+
+  find(collection, query, aggregate) {
+    return new Promise((resolve, reject) => { 
+      this.connectToMongo().then((db) => {
+        if (!aggregate) {
+          db
+            .collection(collection)
+            .find(query)
+            .toArray((err, results) => {
+                if(err) reject(err);
+                else {
+                  resolve(results);
+                }
+              });
+        } else {
+          db
+          .collection(collection)
+          .aggregate(aggregate)
+          .find(query)
+          .toArray((err, results) => {
+              if(err) reject(err);
+              else {
+                resolve(results);
+              }
+            });
+        }
+      });
+    }, (error) => { console.log(error); reject(error); });
+  }
+
+  update(collection, query, obj) {
+    return new Promise((resolve, reject) => { 
+      this.connectToMongo().then((db) => {
+        db
+          .collection(collection)
+          .updateOne(query, { $set: { ...obj }})
           .then((res) => {
               resolve(res);
           });

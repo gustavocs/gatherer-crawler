@@ -61,6 +61,7 @@ const get = (cardId) => {
                             card = bindCard($, cardId, true);
                         } else {
                             card = {
+                                id: cardId,
                                 name: $(config.cardTitleContainer).text().trim(),
                                 faces: new Array()
                             } 
