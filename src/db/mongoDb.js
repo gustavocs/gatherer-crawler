@@ -6,7 +6,7 @@ class MongoDb {
     this.maxSizeInsertMany = 1000;
     this.url = 'mongodb://localhost:27017';
     this.options = {
-      bufferMaxEntries: 0,
+      bufferMaxEntries: 100,
       reconnectTries: 5000,
       useNewUrlParser: true
     };
@@ -24,6 +24,35 @@ class MongoDb {
           (error) => { console.log(error); reject(error); });
 
       }, (error) => { console.log(error); reject(error); });
+  }
+
+  find(collection, query, aggregate) {
+    return new Promise((resolve, reject) => { 
+      this.connectToMongo().then((db) => {
+        if (!aggregate) {
+          db
+            .collection(collection)
+            .find(query)
+            .toArray((err, results) => {
+                if(err) reject(err);
+                else {
+                  resolve(results);
+                }
+              });
+        } else {
+          db
+          .collection(collection)
+          .aggregate(aggregate)
+          .find(query)
+          .toArray((err, results) => {
+              if(err) reject(err);
+              else {
+                resolve(results);
+              }
+            });
+        }
+      });
+    }, (error) => { console.log(error); reject(error); });
   }
 
   async insertManyOptimized(collection, objs) {
@@ -59,35 +88,6 @@ class MongoDb {
     }, (error) => { console.log(error); reject(error); });
   }
 
-  find(collection, query, aggregate) {
-    return new Promise((resolve, reject) => { 
-      this.connectToMongo().then((db) => {
-        if (!aggregate) {
-          db
-            .collection(collection)
-            .find(query)
-            .toArray((err, results) => {
-                if(err) reject(err);
-                else {
-                  resolve(results);
-                }
-              });
-        } else {
-          db
-          .collection(collection)
-          .aggregate(aggregate)
-          .find(query)
-          .toArray((err, results) => {
-              if(err) reject(err);
-              else {
-                resolve(results);
-              }
-            });
-        }
-      });
-    }, (error) => { console.log(error); reject(error); });
-  }
-
   update(collection, query, obj) {
     return new Promise((resolve, reject) => { 
       this.connectToMongo().then((db) => {
@@ -97,6 +97,22 @@ class MongoDb {
           .then((res) => {
               resolve(res);
           });
+      });
+    }, (error) => { console.log(error); reject(error); });
+  }
+
+  updateMany(collection, fieldName, objs) {
+    return new Promise((resolve, reject) => { 
+      this.connectToMongo().then((db) => {
+        for (const obj of objs) {
+          db
+          .collection(collection)
+          .updateOne({ [fieldName]: obj[fieldName] }, { $set: { ...obj.obj }})
+          .then((res) => {
+              resolve(res);
+          });
+        }
+        
       });
     }, (error) => { console.log(error); reject(error); });
   }

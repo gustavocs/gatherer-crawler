@@ -20,6 +20,13 @@ const insertCards = (cards) => {
     }, (error) => { reject(error); });
 }
 
+const getCardsBySet = (set) => {
+    return new Promise(async (resolve, reject) => {
+        const result = await db.find('cards', { 'set.name': set });
+        resolve(result);
+    }, (error) => { reject(error); });
+}
+
 const getCard = (cardId) => {
     return new Promise(async (resolve, reject) => {
         const result = await db.find('cards', { id: cardId });
@@ -52,7 +59,14 @@ const updateCardList = (set, cards) => {
         db.update('sets', { name: set }, { cards })
             .then(() => resolve('done!'));
     }, (error) => { reject(error); });
-    
 }
 
-module.exports = { updateSets, getSets, updateCardList, getCard, insertCard, insertCards, updateCard };
+const updateCards = (cards) => {
+    return new Promise(async (resolve, reject) => {
+        db.updateMany('cards', 'id', cards)
+            .then(() => resolve('done!'));
+    }, (error) => { reject(error); });
+}
+
+
+module.exports = { updateSets, getSets, updateCardList, getCard, insertCard, insertCards, updateCard, getCardsBySet, updateCards };

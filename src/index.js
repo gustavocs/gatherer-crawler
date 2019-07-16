@@ -1,6 +1,8 @@
 // index.js
 
 // imports
+const ObservableArray = require('observable-collection').ObservableArray;
+
 const setsCrawler = require('./crawler/sets');
 const cardsListCrawler = require('./crawler/cardList');
 const cardCrawler = require('./crawler/card');
@@ -9,13 +11,7 @@ const cardPrintingsCrawler = require('./crawler/cardPrintingsAndLegality');
 
 const db = require('./db');
 
-const execute = async () => {
-    await updateSets();
-    await updateCards();
-    await updateCardLanguages();
-    await updateCardPrintings();
-    //process.exit();
-}
+var subscribers = new Array();
 
 const updateSets = async () => {
     const setsRetrieved = await setsCrawler.get();
@@ -40,88 +36,96 @@ const updateCards = async () => {
     const sets = await db.getSets();
     let cardsToInsert = new Array();
 
-    for (const j in sets) {
-        const set = sets[j];
-        if (set.cards) {
-            for (const i in set.cards) {
-                const card = await db.getCard(set.cards[i]);
-                if (!card) {
-                    let card = await cardCrawler.get(set.cards[i]);
-                    console.log(`Retrieved ${ card.name } (${set.name}) succesfuly! Added to queue...`);
-                    cardsToInsert.push(card);
-                } else {
-                    console.log(`${card.name} (${set.name}) already in database.`);
-                }  
-            }
-            if (cardsToInsert.length > 0) {
-                console.log(`Inserting ${cardsToInsert.length} from ${set.name} cards to db...`);
-                console.log(
-                    await db.insertCards(cardsToInsert));
-                cardsToInsert = [];
-            }
-        }   
-    }
-    console.log('finished!');
+    sets.forEach(async (set) => {
+        if (!set.cards) {
+            console.log(`${set.name} has no cards in database. Please review`);
+            return;
+        }
+        const setCards = await db.getCardsBySet(set.name);
+        const cardsToRetrieve = set.cards.filter(x => !setCards.some(c => c.id == x));
+
+        if (cardsToRetrieve.length > 0) {
+            cardsToInsert[set.name] = new ObservableArray();
+            cardsToInsert[set.name].set = set.name;
+            cardsToInsert[set.name].qty = cardsToRetrieve.length;
+
+            subscribers.push(cardsToInsert[set.name].subscribe((arr) => { 
+                if (arr.length > 0 && arr.length == arr.qty) {
+                    db.insertCards(arr).then(() => console.log(`Inserted ${arr.length} cards from ${arr.set}`));
+                }
+            }));
+
+            console.log(`Retrieving ${cardsToRetrieve.length} cards from ${set.name}`);
+            cardsToRetrieve.forEach((cardId) => {
+                cardCrawler.get(cardId).then(async (card) => {
+                    db.insertCards(arr).then(() => console.log(`Retrieved ${card.name} (${set.name})`));
+                    cardsToInsert[set.name].push(card);
+                });
+            });
+        } else {
+            console.log(`${set.name} is up to date! (${setCards.length} cards)`);
+        }
+    }); 
 }
 
 const updateCardLanguages = async () => {
     const sets = await db.getSets();
-    let cardsToUpdate = new Array();
+    let cardsToUpdate = {};
 
-    for (const j in sets) {
-        const set = sets[j];
-        if (set.cards) {
-            for (const i in set.cards) {
-                const card = await db.getCard(set.cards[i]);
-                if (!card.languages) {
-                    const languages = await cardLanguagesCrawler.get(set.cards[i]);
-                    console.log(`Retrieved languages from ${ card.name } (${set.name}) succesfuly!`);
-                    cardsToUpdate.push({ id: set.cards[i], languages });
-                } else {
-                    console.log(`${card.name} (${set.name}) languages already in database.`);
-                }  
+    sets.forEach(async (set) => {
+        const setCards = await db.getCardsBySet(set.name);
+        const cards = setCards.filter(c => set.cards.includes(c.id) && !c.languages);
+
+        cardsToUpdate[set.name] = new ObservableArray();
+        cardsToUpdate[set.name].set = set.name;
+        cardsToUpdate[set.name].qty = cards.length;
+
+        subscribers.push(cardsToUpdate[set.name].subscribe((arr) => { 
+            if (arr.length > 0 && arr.length == arr.qty) {
+                db.updateCards(arr).then(() => console.log(`Inserted languages for ${arr.length} cards from ${arr.set}`));
             }
-            if (cardsToUpdate.length > 0) {
-                console.log(`Inserting ${cardsToUpdate.length} languages from ${set.name} cards to db...`);
-                for (const lang in cardsToUpdate) {
-                    console.log(
-                        await db.updateCard(lang.id, lang.languages));
-                }
-                cardsToUpdate = [];
-            }
-        }   
-    }
-    console.log('finished!');
+        }));
+
+        cards.forEach((card) => {
+            cardLanguagesCrawler.get(card.id).then((languages) => {
+                console.log(`Retrieved languages from ${ card.name } (${set.name}) succesfuly!`);
+                cardsToUpdate[set.name].push({ id: card.id, obj: { languages } });
+            });
+        });
+    }); 
 }
 
 const updateCardPrintings = async () => {
     const sets = await db.getSets();
-    let cardsToUpdate = new Array();
+    let cardsToUpdate = {};
 
-    for (const j in sets) {
-        const set = sets[j];
-        if (set.cards) {
-            for (const i in set.cards) {
-                const card = await db.getCard(set.cards[i]);
-                if (!card.printings) {
-                    const printingsAndLegality = await cardPrintingsCrawler.get(set.cards[i]);
-                    console.log(`Retrieved printings and legality from ${ card.name } (${set.name}) succesfuly!`);
-                    cardsToUpdate.push({ id: set.cards[i], printingsAndLegality });
-                } else {
-                    console.log(`${card.name} (${set.name}) printings and legality already in database.`);
-                }  
+    sets.forEach(async (set) => {
+        const setCards = await db.getCardsBySet(set.name);
+        const cards = setCards.filter(c => set.cards.includes(c.id) && !c.printingsAndLegality);
+
+        cardsToUpdate[set.name] = new ObservableArray();
+        cardsToUpdate[set.name].set = set.name;
+        cardsToUpdate[set.name].qty = cards.length;
+
+        subscribers.push(cardsToUpdate[set.name].subscribe((arr) => { 
+            if (arr.length > 0 && arr.length == arr.qty) {
+                db.updateCards(arr).then(() => console.log(`Inserted printings and legality for ${arr.length} cards from ${arr.set}`));
             }
-            if (cardsToUpdate.length > 0) {
-                console.log(`Inserting ${cardsToUpdate.length} printings and legality from ${set.name} cards to db...`);
-                for (const lang in cardsToUpdate) {
-                    console.log(
-                        await db.updateCard(lang.id, lang.printingsAndLegality));
-                }
-                cardsToUpdate = [];
-            }
-        }   
-    }
-    console.log('finished!');
+        }));
+
+        cards.forEach((card) => {
+            cardPrintingsCrawler.get(card.id).then((printingsAndLegality) => {
+                console.log(`Retrieved printings and legality from ${ card.name } (${set.name}) succesfuly!`);
+                cardsToUpdate[set.name].push({ id: card.id, obj: { printingsAndLegality } });
+            });
+        });
+    }); 
 }
 
-execute();
+(async () => {
+    await updateSets();
+    await updateCards();
+    await updateCardLanguages();
+    await updateCardPrintings();
+    // process.exit();
+})();
