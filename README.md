@@ -1,9 +1,9 @@
 # gatherer-crawler
-**gatherer crawler** is a web crawler that gets Magic: The Gathering card database from [Gatherer](https://gatherer.wizards.com) and save it to a mongoDb.
+**Gatherer Crawler** is a web crawler that gets Magic: The Gathering card database from [Gatherer](https://gatherer.wizards.com) and save it to a **mongoDb**.
 
-**gatherer crawler** retrieves all card information, languages and printings.
+**gatherer crawler** retrieves all card information, rulings, languages and printings.
 
-Sample json parsed:
+Sample JSON card:
 
 ```json
 {   "id": 430589,
@@ -33,7 +33,7 @@ Sample json parsed:
 }
 ```
 
-## featuring
+## featuring / pre-requisites
 - [Node.js](https://nodejs.org/en/download/)
 - [MongoDb](http://mongodb.com)
 - [node-crawler](http://nodecrawler.org/)
@@ -44,7 +44,7 @@ Adjust your database instance url and database name in `config.js` file.
 module.exports = {
     databaseUrl: 'mongodb://localhost:27017',
     databaseName: 'Magic',
-    crawlerMaxConnections: 20 // 20 connections doesn't look like too much for Gatherer servers
+    crawlerMaxConnections: 20 // doesn't look like too much for Gatherer server
 }
 ```
 Then install packages and create a symlink to gatherer-crawler:
@@ -54,7 +54,7 @@ npm link
 ```
 
 ## update database
-Generates / updates a database with sets and cards data. 
+Generates / updates a database with sets and cards data from Gatherer. 
 ```
 gatherer-crawler update
 ```
@@ -63,10 +63,12 @@ Update task runs async and inserts and updates cards separated by editions in ba
 
 After inserting / updating cards from a edition, it clears edition queue to free out memory space, but sometimes it could runs out of memory (ie. when crawler couldn't retrieve all cards from many editions for some reason and task accumulates too many cards in memory before inserting). In this case, it's just stop executing and run it again.
 
-Please notice tasks that update languages, printings and legality info could run only after card database is complete. It happens because it's too much information to save in memory and too much data to 
+Please notice tasks that update languages, printings and legality could run only after card database is complete. It's needed because it's too much information to save in memory and too much data to get from web and it could crash application.
 
 
-## get a single card information
+## single card information
+
+
 ```
 gatherer-crawler card [cardId]
 ```
