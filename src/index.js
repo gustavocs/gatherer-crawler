@@ -10,6 +10,7 @@ const cardPrintingsCrawler = require('./crawler/cardPrintingsAndLegality');
 const service = require('./service');
 
 var subscribers = new Array();
+var updatingSets = false;
 
 const updateSets = async () => {
     const setsRetrieved = await setsCrawler.get();
@@ -18,16 +19,18 @@ const updateSets = async () => {
         await service.updateSets(setsRetrieved));
 
     const sets = await service.getSets();
-    for (const set of sets) {
+    sets.forEach(async (set) => {
         if (!set.cards) {
+            updatingSets = true;
+            console.log(`${set.name} has no card list in database. Retrieving...`);
             const cards = await cardsListCrawler.get(set.name);
-            if (cards && cards.length > 0) { 
+            if (cards) { 
                 console.log(`Retrieved ${ cards.length } cards from ${set.name}. Inserting...`);
                 console.log(
                     await service.updateCardList(set.name, cards));
             }
         }
-    }
+    });
 }
 
 const updateCards = async () => {
@@ -131,12 +134,17 @@ const updateCardPrintings = async () => {
 
 (async () => {
     await updateSets();
-    await updateCards();
 
-    if (subscribers && subscribers.length > 0) {
-        console.log('Skipping languages and printings / legalit work. Please wait to cards search to finish and run application again.');
+    if (updatingSets) {
+        console.log('Sets are being update. Skipping cards. Please wait to sets update to finish and run application again.');
     } else {
-        await updateCardLanguages();
-        await updateCardPrintings();
+        await updateCards();
+
+        if (subscribers && subscribers.length > 0) {
+            console.log('Skipping languages and printings / legalit work. Please wait to cards search to finish and run application again.');
+        } else {
+            await updateCardLanguages();
+            await updateCardPrintings();
+        }
     }
 })();
