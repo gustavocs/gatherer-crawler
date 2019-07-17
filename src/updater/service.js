@@ -1,4 +1,4 @@
-const MongoDb = require('./db/mongoDb').MongoDb;
+const MongoDb = require('../db/mongoDb').MongoDb;
 const db = new MongoDb();
 
 const getSets = () => {
