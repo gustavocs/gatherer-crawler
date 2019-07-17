@@ -16,7 +16,7 @@ const bindCard = ($, cardId, single, containerId) => {
 
     cardId = (single) ? cardId : $(config.cardContainer(cardProperty.IMAGE, single, containerId)).attr('src').split('multiverseid=')[1].split('&')[0];
     card = {
-        id: cardId,
+        id: parseInt(cardId),
         text: text.trim(),
         imageUrl: config.cardImageUrl(cardId),
         name: $(config.cardContainer(cardProperty.NAME, single, containerId)).text().trim(),
@@ -61,7 +61,7 @@ const get = (cardId) => {
                             card = bindCard($, cardId, true);
                         } else {
                             card = {
-                                id: cardId,
+                                id: parseInt(cardId),
                                 name: $(config.cardTitleContainer).text().trim(),
                                 faces: new Array()
                             } 
@@ -74,9 +74,6 @@ const get = (cardId) => {
 
                             card.set = card.faces[0].set;
                             card.rarity = card.faces[0].rarity;
-                            
-                            // TODO: Review
-                            // card.cmc = card.faces.max(f => f.cmc);
                         }
 
                         resolve(card); 
