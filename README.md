@@ -63,7 +63,11 @@ Update task runs asyncronously and inserts and updates cards separated by editio
 
 After inserting / updating cards from a edition, it clears edition queue to free out memory space. Even though it sometimes could runs out of memory (ie. when crawler couldn't retrieve all cards from many editions for some reason and task accumulates too many cards saved in memory before inserting). In this case, it's just stop executing and run it again.
 
-Please notice tasks that update languages, printings and legality could run only after card database is complete for obvious reasons :)
+Please notice:
+
+1. Tasks that update languages, printings and legality could run only after card database is complete for obvious reasons :)
+
+2. Gatherer Crawler performance depends on the Gatherer availability and speed response. It has a default timeout and retry policy, so sometimes you can get a lot of timeout errors. When that happens, I strongly advice you to wait for the Gatherer to be stable and start update task again.   
 
 
 ## single card information
