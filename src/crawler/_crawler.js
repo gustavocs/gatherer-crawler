@@ -1,7 +1,8 @@
 const crawler = require("crawler");
+const config = require("../config");
 
 module.exports = new crawler({
-    maxConnections: 20,
+    maxConnections: config.crawlerMaxConnections,
     callback : function (error, res, done) {
         if(error){
             console.log(error);

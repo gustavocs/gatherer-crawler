@@ -1,10 +1,12 @@
 const MongoClient = require('mongodb').MongoClient;
+const config = require("../config");
 
 class MongoDb {
   constructor() {
     this.db = null;
+    this.dbName = config.databaseName;
+    this.url = config.databaseUrl;
     this.maxSizeInsertMany = 1000;
-    this.url = 'mongodb://localhost:27017';
     this.options = {
       bufferMaxEntries: 100,
       reconnectTries: 5000,
@@ -19,7 +21,7 @@ class MongoDb {
 
       return MongoClient.connect(this.url, this.options)
           .then(client => {
-            this.db = client.db('Magic');
+            this.db = client.db(this.dbName);
             resolve(this.db); },
           (error) => { console.log(error); reject(error); });
 

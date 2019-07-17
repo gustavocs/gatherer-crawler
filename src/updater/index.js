@@ -53,7 +53,10 @@ const updateCards = async () => {
 
             subscribers.push(cardsToInsert[set.name].subscribe((arr) => { 
                 if (arr.length > 0 && arr.length == arr.qty) {
-                    service.insertCards(arr).then(() => console.log(`Inserted ${arr.length} cards from ${arr.set}`));
+                    service.insertCards(arr).then(() => {
+                        console.log(`Inserted ${arr.length} cards from ${arr.set}`); 
+                        rr = []; 
+                    });
                 }
             }));
 
@@ -85,7 +88,10 @@ const updateCardLanguages = async () => {
 
             subscribers.push(cardsToUpdate[set.name].subscribe((arr) => { 
                 if (arr.length > 0 && arr.length == arr.qty) {
-                    service.updateCards(arr).then(() => console.log(`Inserted languages for ${arr.length} cards from ${arr.set}`));
+                    service.updateCards(arr).then(() => { 
+                        console.log(`Inserted languages for ${arr.length} cards from ${arr.set}`); 
+                        arr = []; 
+                    });
                 }
             }));
 
@@ -116,7 +122,10 @@ const updateCardPrintings = async () => {
 
             subscribers.push(cardsToUpdate[set.name].subscribe((arr) => { 
                 if (arr.length > 0 && arr.length == arr.qty) {
-                    service.updateCards(arr).then(() => console.log(`Inserted printings and legality for ${arr.length} cards from ${arr.set}`));
+                    service.updateCards(arr).then(() => {
+                        console.log(`Inserted printings and legality for ${arr.length} cards from ${arr.set}`);
+                        arr = [];
+                    });
                 }
             }));
 
