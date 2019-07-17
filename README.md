@@ -59,11 +59,11 @@ Generates / updates a database with sets and cards data from Gatherer.
 gatherer-crawler update
 ```
 
-Update task runs async and inserts and updates cards separated by editions in batches to avoid opening TCP connections to mongoDB and runs out of SO buffer. 
+Update task runs asyncronously and inserts and updates cards separated by editions in batches to avoid opening too many TCP connections to mongoDB that could cause SO to runs out of buffer.
 
-After inserting / updating cards from a edition, it clears edition queue to free out memory space, but sometimes it could runs out of memory (ie. when crawler couldn't retrieve all cards from many editions for some reason and task accumulates too many cards in memory before inserting). In this case, it's just stop executing and run it again.
+After inserting / updating cards from a edition, it clears edition queue to free out memory space. Even though it sometimes could runs out of memory (ie. when crawler couldn't retrieve all cards from many editions for some reason and task accumulates too many cards saved in memory before inserting). In this case, it's just stop executing and run it again.
 
-Please notice tasks that update languages, printings and legality could run only after card database is complete. It's needed because it's too much information to save in memory and too much data to get from web and it could crash application.
+Please notice tasks that update languages, printings and legality could run only after card database is complete for obvious reasons :)
 
 
 ## single card information
