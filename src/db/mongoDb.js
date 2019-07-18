@@ -15,22 +15,24 @@ class MongoDb {
   }
 
   // singleton connect
-  connectToMongo() {
+  connect() {
     return new Promise((resolve, reject) => {
-      if (this.db) resolve(this.db);
-
-      return MongoClient.connect(this.url, this.options)
+      if (this.db) { 
+          resolve(this.db);
+      } else {
+        MongoClient.connect(this.url, this.options)
           .then(client => {
             this.db = client.db(this.dbName);
             resolve(this.db); },
           (error) => { console.log(error); reject(error); });
-
-      }, (error) => { console.log(error); reject(error); });
+          }
+      }, (error) => { console.log(error); });
+      
   }
 
   find(collection, query, aggregate) {
     return new Promise((resolve, reject) => { 
-      this.connectToMongo().then((db) => {
+      this.connect().then((db) => {
         if (!aggregate) {
           db
             .collection(collection)
@@ -66,7 +68,7 @@ class MongoDb {
 
   insertMany(collection, objs) {
     return new Promise((resolve, reject) => { 
-      this.connectToMongo().then((db) => {
+      this.connect().then((db) => {
         db
           .collection(collection)
           .insertMany(objs)
@@ -79,7 +81,7 @@ class MongoDb {
 
   insert(collection, obj) {
     return new Promise((resolve, reject) => { 
-      this.connectToMongo().then((db) => {
+      this.connect().then((db) => {
         db
           .collection(collection)
           .insertOne(obj)
@@ -92,7 +94,7 @@ class MongoDb {
 
   update(collection, query, obj) {
     return new Promise((resolve, reject) => { 
-      this.connectToMongo().then((db) => {
+      this.connect().then((db) => {
         db
           .collection(collection)
           .updateOne(query, { $set: { ...obj }})
@@ -105,7 +107,7 @@ class MongoDb {
 
   updateMany(collection, fieldName, objs) {
     return new Promise((resolve, reject) => { 
-      this.connectToMongo().then((db) => {
+      this.connect().then((db) => {
         for (const obj of objs) {
           db
           .collection(collection)
