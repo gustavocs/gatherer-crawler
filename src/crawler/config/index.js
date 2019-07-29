@@ -46,7 +46,7 @@ module.exports = {
     },
 
     cardPrintingsAndLegalityUrl: (cardId) => { return `https://gatherer.wizards.com/Pages/Card/Printings.aspx?multiverseid=${cardId}`; },
-    cardDetailsUrl: (cardId) => { return `https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=${cardId}` },
+    cardDetailsUrl: (cardId, printed) => { return `https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=${cardId}&printed=${printed}` },
     cardLanguagesUrl: (cardId) => { return `https://gatherer.wizards.com/Pages/Card/Languages.aspx?multiverseid=${cardId}` },
     cardSearchUrl: (edition, page) => { return encodeURI(`https://gatherer.wizards.com/Pages/Search/Default.aspx?set=["${edition}"]&page=${page}`); },
     cardImageUrl: (cardId) => { return `https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=${cardId}&type=card` },

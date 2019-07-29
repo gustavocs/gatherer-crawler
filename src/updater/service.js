@@ -27,6 +27,32 @@ const getCardsBySet = (set) => {
     }, (error) => { reject(error); });
 }
 
+const getForeignMissingCardsBySet = (set, language) => {
+    return new Promise(async (resolve, reject) => {
+        const result = await db.find('cards', {
+            'set.name': set,
+            'languages.translatedLanguage': language
+        });
+
+        resolve(result.map(card => {
+            return {
+                multiverseId: card.id,
+                id: card.languages.find(l => l.translatedLanguage == language).id
+            };
+        }));
+    }, (error) => { reject(error); });
+}
+
+const getForeignCardsBySet = (set, language) => {
+    return new Promise(async (resolve, reject) => {
+        const result = await db.find('cards', {
+            'set.name': set,
+            'foreign': true,
+            'language': language });
+        resolve(result);
+    }, (error) => { reject(error); });
+}
+
 const getCard = (cardId) => {
     return new Promise(async (resolve, reject) => {
         const result = await db.find('cards', { id: cardId });
@@ -69,4 +95,16 @@ const updateCards = (cards) => {
 }
 
 
-module.exports = { updateSets, getSets, updateCardList, getCard, insertCard, insertCards, updateCard, getCardsBySet, updateCards };
+module.exports = { 
+    updateSets,
+    getSets,
+    updateCardList,
+    getCard,
+    insertCard,
+    insertCards,
+    updateCard, 
+    getCardsBySet,
+    updateCards,
+    getForeignCardsBySet,
+    getForeignMissingCardsBySet
+};

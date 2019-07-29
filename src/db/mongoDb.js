@@ -26,7 +26,7 @@ class MongoDb {
             resolve(this.db); },
           (error) => { console.log(error); reject(error); });
           }
-      }, (error) => { console.log(error); });
+      });
       
   }
 

@@ -11,6 +11,11 @@ const cardPrintingsAndLegalityCrawler = require('./crawler/cardPrintingsAndLegal
     } else {
         switch (process.argv[2]) {
             case 'update': { updater.execute(); break; }
+            case 'update-foreign': {
+                const translatedLanguage = process.argv[3];
+                updater.updateForeignCards(translatedLanguage);
+                break;
+            }
             case 'card' : {
                 const cardId = process.argv[3];
                 if (!cardId) { console.log('No card id passed as argument'); break; }

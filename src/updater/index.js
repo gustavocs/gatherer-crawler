@@ -80,6 +80,7 @@ const updateCardLanguages = async () => {
     sets.forEach(async (set) => {
         const setCards = await service.getCardsBySet(set.name);
         const cards = setCards.filter(c => set.cards.includes(c.id) && !c.languages);
+        const cardsToRetrieve = set.cards.filter(x => !setCards.some(c => c.id == x));
 
         if (cards && cards.length > 0) {
             cardsToUpdate[set.name] = new ObservableArray();
@@ -107,12 +108,50 @@ const updateCardLanguages = async () => {
     }); 
 }
 
+const updateForeignCards = async (language) => {
+    const sets = await service.getSets();
+    let cardsToInsert = new Array();
+
+    for (const set of sets) {
+        const cards = await service.getForeignMissingCardsBySet(set.name, language);
+        const setCards = await service.getForeignCardsBySet(set.name, language);
+        
+        const cardsToRetrieve = cards.filter(x => !setCards.some(c => c.id == x.id));
+
+        if (cardsToRetrieve.length > 0) {
+            console.log(`${set.name} has ${cardsToRetrieve.length} to be retrieved. Starting...`);
+            cardsToInsert[set.name] = new ObservableArray();
+            cardsToInsert[set.name].set = set.name;
+            cardsToInsert[set.name].qty = cardsToRetrieve.length;
+
+            subscribers.push(cardsToInsert[set.name].subscribe((arr) => { 
+                if (arr.length > 0 && arr.length == arr.qty) {
+                    service.insertCards(arr).then(() => {
+                        console.log(`Inserted ${arr.length} cards from ${arr.set}`); 
+                        arr = []; 
+                    });
+                }
+            }));
+
+            console.log(`Retrieving ${cardsToRetrieve.length} cards from ${set.name}`);
+            cardsToRetrieve.forEach((card) => {
+                cardCrawler.get(card.id, { multiverseId: card.multiverseId, language }).then(async (card) => {
+                    console.log(`Retrieved ${card.name} (${set.name})`);
+                    cardsToInsert[set.name].push(card);
+                });
+            });
+        } else {
+            console.log(`${set.name} is up to date! (${setCards.length} cards)`);
+        }
+    } 
+}
+
 const updateCardPrintings = async () => {
     const sets = await service.getSets();
     let cardsToUpdate = {};
 
     sets.forEach(async (set) => {
-        const setCards = await service.getCardsBySet(set.name);
+        const setCards = await servicegit.getCardsBySet(set.name);
         const cards = setCards.filter(c => set.cards.includes(c.id) && !c.printings && !c.legality);
 
         if (cards && cards.length > 0) {
@@ -158,4 +197,4 @@ const execute = async () => {
     }
 };
 
-module.exports = { execute };
+module.exports = { execute, updateForeignCards };

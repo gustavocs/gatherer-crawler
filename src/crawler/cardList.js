@@ -5,7 +5,7 @@ const get = (edition) => {
     return new Promise((resolve, reject) => {
         getCardList(edition, 0, []).then(cards => {
             resolve(cards.filter((v, i, a) => a.indexOf(v) === i)); // distinct
-        }, (error) => reject(error));
+        }).catch((error) => { reject(error); });
     });
 }
 const getCardList = (edition, page, cards) => {
