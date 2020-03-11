@@ -20,7 +20,7 @@ const bindCard = ($, cardId, single, containerId) => {
         text: text.trim(),
         imageUrl: config.cardImageUrl(cardId),
         name: $(config.cardContainer(cardProperty.NAME, single, containerId)).text().trim(),
-        cmc: $(config.cardContainer(cardProperty.CMC, single, containerId)).text().trim(),
+        cmc: parseInt($(config.cardContainer(cardProperty.CMC, single, containerId)).text().trim()),
         type: types[0].trim(),
         rarity: $(config.cardContainer(cardProperty.RARITY, single, containerId)).text().trim(),
         number: $(config.cardContainer(cardProperty.NUMBER, single, containerId)).text().trim(),
